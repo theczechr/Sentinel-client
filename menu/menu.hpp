@@ -1,7 +1,8 @@
 #pragma once
 #include "../vendor/aixlog.hpp"
 
-#include "../vendor/bcrypt/include/bcrypt.h"
+#include "../vendor/bcrypt/include/BCrypt.hpp"
+
 namespace menu
 {
 	void start();

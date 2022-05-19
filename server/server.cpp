@@ -7,7 +7,7 @@ using namespace std::chrono_literals;
 void server::ping()
 {
     std::string server = "ws://127.0.0.1";
-    std::string path = "/test";
+    std::string path = "/ping";
     drogon::optional<uint16_t> port = 8848;
 
     std::string serverString;

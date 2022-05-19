@@ -47,6 +47,12 @@ void menu::create()
 	std::cin >> password;
 	std::cout << "Enter phone number (9-10): ";
 	std::cin >> phone_number;
+
+	email = BCrypt::generateHash(email);
+	password = BCrypt::generateHash(password);
+	phone_number = BCrypt::generateHash(phone_number);
+
+	// send to a server
 }
 
 void menu::login()
