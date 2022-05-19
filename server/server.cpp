@@ -1,6 +1,4 @@
 #include "server.hpp"
-#include "server.hpp"
-#include "connection.hpp"
 
 using namespace std::chrono_literals;
 
@@ -72,8 +70,8 @@ bool server::is_online()
                 wsPtr->stop();
                 return false;
             }
-            LOG_INFO << "Server is online";
-            wsPtr->stop();
-            return true;
         });
+    LOG_INFO << "Server is online";
+    wsPtr->stop();
+    return true;
 }
