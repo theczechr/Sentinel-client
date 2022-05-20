@@ -7,8 +7,8 @@ void menu::start()
 
 	while (choosing_path)
 	{
-		LOG(INFO) << "INFO: " << "[1] Login\n";
-		LOG(INFO) << "INFO: " << "[2] Register\n";
+		LOG_INFO << "INFO: " << "[1] Login";
+		LOG_INFO << "INFO: " << "[2] Register";
 		std::cin >> choice;
 
 		switch (choice)
@@ -23,7 +23,7 @@ void menu::start()
 			break;
 		default:
 
-			LOG(ERROR) << "ERROR: " << "Spatne cislo\n";
+			LOG_ERROR << "ERROR: " << "Spatne cislo\n";
 
 			choosing_path = false;
 			break;
@@ -38,7 +38,7 @@ void menu::create()
 	std::string password;
 	std::string phone_number;
 
-	LOG(INFO) << "INFO: " << "* - required\n";
+	LOG_INFO << "INFO: " << "* - required";
 	std::cout << "Enter username (1-50)*: ";
 	std::cin >> username;
 	std::cout << "Enter email (5-50): ";
@@ -47,12 +47,29 @@ void menu::create()
 	std::cin >> password;
 	std::cout << "Enter phone number (9-10): ";
 	std::cin >> phone_number;
+	
+	Botan::AutoSeeded_RNG rng;
+	// DOCS k botanu:
+		// https://botan.randombit.net/handbook/botan.pdf
+		// https://botan.randombit.net/handbook/
+	email = Botan::generate_bcrypt(email, rng);
+	password = Botan::generate_bcrypt(password, rng);
+	phone_number = Botan::generate_bcrypt(phone_number, rng);
 
-	email = BCrypt::generateHash(email);
-	password = BCrypt::generateHash(password);
-	phone_number = BCrypt::generateHash(phone_number);
+	// Vypise ty hashe
+	LOG_INFO << email;
+	LOG_INFO << password;
+	LOG_INFO << phone_number;
 
-	// send to a server
+	/*
+	* Returnuje to, jestli to matchuje
+	* Jenom jsem zkousel jestli to funguje
+	LOG_INFO << Botan::check_bcrypt("karlos@protonmail.com", "$2a$12$EZO38XCgdPikYUng7l5np.KkxUB45OpsHgNI3dM1MDJn6t1hxw9lq");
+	LOG_INFO << Botan::check_bcrypt("sdag12hd1dh1d^*&(", "$2a$12$1gOINTpsQm1yaj7WtKCsv.tNgHcfwFOTRPnWPmW8z2p8H7/cxsbd2");
+	LOG_INFO << Botan::check_bcrypt("789123658", "$2a$12$qDyufSzMRl.N/GkFWLMU3.HPRSKYWCWAJIRKhMKiwsJ.rRYs157B.");
+	*/
+
+	// Send to server
 }
 
 void menu::login()
@@ -60,7 +77,7 @@ void menu::login()
 	std::string username;
 	std::string password;
 
-	LOG(ERROR) << "ERROR: " << "Leave blank if none\n";
+	LOG_INFO << "ERROR: " << "Leave blank if none";
 	std::cout << "Enter username: ";
 	std::cin >> username;
 	std::cout << "Enter password: ";

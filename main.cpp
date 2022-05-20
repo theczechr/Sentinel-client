@@ -1,7 +1,8 @@
 #include "server.hpp"
-#include <iostream>
-#include <iomanip>
+#include "menu.hpp"
+
 int main()
 {
-	server::ping();
+	//server::ping();
+	menu::start();
 }

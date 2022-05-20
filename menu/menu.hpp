@@ -1,7 +1,8 @@
 #pragma once
-#include "../vendor/aixlog.hpp"
-
-#include "../vendor/bcrypt/include/BCrypt.hpp"
+#include <drogon/WebSocketClient.h>
+#include <drogon/HttpAppFramework.h>
+#include <botan/bcrypt.h>
+#include <botan/auto_rng.h>
 
 namespace menu
 {
