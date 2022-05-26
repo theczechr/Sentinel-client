@@ -9,3 +9,9 @@ namespace valid
 	bool password(std::string password);
 	bool phone(std::string phone_number);
 }
+
+namespace create
+{
+	std::string hash(std::string item);
+	std::string recovery_phrase(int lenght);
+}
