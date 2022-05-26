@@ -15,6 +15,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/server
     ${CMAKE_CURRENT_SOURCE_DIR}/menu
     ${CMAKE_CURRENT_SOURCE_DIR}/security
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libbcrypt/include
 )
 
 file(GLOB SRC
@@ -22,7 +23,7 @@ file(GLOB SRC
    ${CMAKE_CURRENT_SOURCE_DIR}/server/*.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/menu/*.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/security/*.cpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/vendor/bcrypt/src/*.c
+   ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libbcrypt/src/*.c
 )
 
 find_package(Drogon CONFIG REQUIRED)

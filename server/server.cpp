@@ -1,5 +1,4 @@
 #include "server.hpp"
-
 using namespace std::chrono_literals;
 
 void server::ping()
@@ -70,8 +69,47 @@ bool server::is_online()
                 wsPtr->stop();
                 return false;
             }
+            else
+            {
+                LOG_INFO << "Server is online";
+                wsPtr->stop();
+            }
+
         });
-    LOG_INFO << "Server is online";
-    wsPtr->stop();
-    return true;
+    return false;
+}
+void server::send_message(std::string &message, std::string &room_name)
+{
+    std::string server = "ws://127.0.0.1";
+    std::string path = "/test";
+    drogon::optional<uint16_t> port = 8848;
+    const std::string key = "room_name";
+    const std::string value = "hello";
+    std::string serverString;
+    if (port.value_or(0) != 0)
+        serverString = server + ":" + std::to_string(port.value());
+    else
+        serverString = server;
+    auto wsPtr = drogon::WebSocketClient::newWebSocketClient(serverString);
+    auto req = drogon::HttpRequest::newHttpRequest();
+    req->setPath(path);
+    req->setParameter(key, room_name);
+    wsPtr->connectToServer(
+        req,
+        [message](drogon::ReqResult r,
+            const drogon::HttpResponsePtr&,
+            const drogon::WebSocketClientPtr& wsPtr) {
+                if (r != drogon::ReqResult::Ok)
+                {
+                    LOG_ERROR << "Failed to establish WebSocket connection!";
+                    wsPtr->stop();
+                    return;
+                }
+                LOG_INFO << "WebSocket connected!";
+                wsPtr->getConnection()->send(message, drogon::WebSocketMessageType::Text);
+        });
+    drogon::app().getLoop()->runAfter(15, []() { drogon::app().quit(); });
+    drogon::app().setLogLevel(trantor::Logger::kInfo);
+    drogon::app().run();
+    LOG_INFO << "bye!";
 }
