@@ -3,6 +3,7 @@
 #include <drogon/HttpAppFramework.h>
 #include <botan/bcrypt.h>
 #include <botan/auto_rng.h>
+#include "server.hpp"
 
 namespace menu
 {

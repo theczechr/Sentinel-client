@@ -10,7 +10,7 @@ namespace valid
 	bool phone(std::string phone_number);
 }
 
-namespace create
+namespace create // Jak to pojmenovat ?
 {
 	std::string hash(std::string item);
 	std::string recovery_phrase(int lenght);

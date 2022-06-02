@@ -19,7 +19,7 @@ void server::ping()
 
     wsPtr->setMessageHandler([](const std::string& message, const drogon::WebSocketClientPtr&, const drogon::WebSocketMessageType& type)
     {
-        LOG_INFO << "Sent message (ping): " << message;
+        LOG_INFO << "Received response from server '" << message << "'";
     });
 
     wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
@@ -27,12 +27,13 @@ void server::ping()
         LOG_INFO << "WebSocket connection closed!";
     });
 
-    LOG_INFO << "Connecting to WebSocket at " << server;
+    LOG_INFO << "Connecting to WebSocket at: " << server;
     wsPtr->connectToServer(req, [](drogon::ReqResult r, const drogon::HttpResponsePtr&, const drogon::WebSocketClientPtr& wsPtr)
         {
             if (r != drogon::ReqResult::Ok)
             {
                 LOG_ERROR << "Failed to establish WebSocket connection!";
+                LOG_ERROR << "Request result: " << r;
                 wsPtr->stop();
                 return;
             }
@@ -48,7 +49,7 @@ void server::ping()
 bool server::is_online()
 {
     std::string server = "ws://127.0.0.1";
-    std::string path = "/test";
+    std::string path = "/connectionTest";
     drogon::optional<uint16_t> port = 8848;
 
     std::string serverString;
@@ -62,29 +63,29 @@ bool server::is_online()
     req->setPath(path);
 
     wsPtr->connectToServer(req, [](drogon::ReqResult r, const drogon::HttpResponsePtr&, const drogon::WebSocketClientPtr& wsPtr)
+    {
+        if (r != drogon::ReqResult::Ok)
         {
-            if (r != drogon::ReqResult::Ok)
-            {
-                LOG_ERROR << "Server is offline";
-                wsPtr->stop();
-                return false;
-            }
-            else
-            {
-                LOG_INFO << "Server is online";
-                wsPtr->stop();
-            }
-
-        });
-    return false;
+            LOG_ERROR << "Server is offline";
+            LOG_ERROR << "Request result: " << r;
+            wsPtr->stop();
+            return false;
+        }
+        LOG_INFO << "Server is online";
+        wsPtr->stop();
+    });
+    return true;
 }
+
 void server::send_message(std::string &message, std::string &room_name)
 {
     std::string server = "ws://127.0.0.1";
     std::string path = "/test";
     drogon::optional<uint16_t> port = 8848;
+
     const std::string key = "room_name";
     const std::string value = "hello";
+
     std::string serverString;
     if (port.value_or(0) != 0)
         serverString = server + ":" + std::to_string(port.value());
@@ -92,8 +93,10 @@ void server::send_message(std::string &message, std::string &room_name)
         serverString = server;
     auto wsPtr = drogon::WebSocketClient::newWebSocketClient(serverString);
     auto req = drogon::HttpRequest::newHttpRequest();
+
     req->setPath(path);
     req->setParameter(key, room_name);
+
     wsPtr->connectToServer(
         req,
         [message](drogon::ReqResult r,
@@ -102,6 +105,7 @@ void server::send_message(std::string &message, std::string &room_name)
                 if (r != drogon::ReqResult::Ok)
                 {
                     LOG_ERROR << "Failed to establish WebSocket connection!";
+                    LOG_ERROR << "Request result: " << r;
                     wsPtr->stop();
                     return;
                 }
@@ -112,4 +116,102 @@ void server::send_message(std::string &message, std::string &room_name)
     drogon::app().setLogLevel(trantor::Logger::kInfo);
     drogon::app().run();
     LOG_INFO << "bye!";
+}
+
+void server::check_account_existation(std::string username, std::string email_hash, std::string password_hash, std::string phone_hash)
+{
+    // ?
+}
+
+void server::create_account(std::string username, std::string email_hash, std::string password_hash, std::string phone_hash)
+{
+    std::string server = "ws://127.0.0.1";
+    std::string path = "/register";
+    drogon::optional<uint16_t> port = 8848;
+
+    std::string serverString;
+    if (port.value_or(0) != 0)
+        serverString = server + ":" + std::to_string(port.value());
+    else
+        serverString = server;
+
+    auto wsPtr = drogon::WebSocketClient::newWebSocketClient(serverString);
+    auto req = drogon::HttpRequest::newHttpRequest();
+
+    req->setPath(path);
+    req->setMethod(drogon::HttpMethod::Head);
+    req->setParameter("username", username);
+    req->setParameter("email_hash", email_hash);
+    req->setParameter("password_hash", password_hash);
+    req->setParameter("phone_hash", phone_hash);
+
+    wsPtr->setMessageHandler([](const std::string& message, const drogon::WebSocketClientPtr&, const drogon::WebSocketMessageType& type)
+    {
+        LOG_INFO << "Received response from server '" << message << "'";
+    });
+
+    wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
+        {
+            LOG_INFO << "WebSocket connection closed!";
+        });
+
+    LOG_INFO << "Connecting to WebSocket at: " << server;
+    wsPtr->connectToServer(req, [](drogon::ReqResult r, const drogon::HttpResponsePtr&, const drogon::WebSocketClientPtr& wsPtr)
+        {
+            if (r != drogon::ReqResult::Ok)
+            {
+                LOG_ERROR << "Failed to establish WebSocket connection!";
+                LOG_ERROR << "Request result: " << r;
+                wsPtr->stop();
+                return;
+            }
+            LOG_INFO << "WebSocket connected!";
+        });
+
+    drogon::app().setLogLevel(trantor::Logger::kInfo);
+    drogon::app().run();
+    //drogon::app().getLoop()->runAfter(1, []() { drogon::app().run(); });
+}
+
+void server::login_account(std::string username, std::string password_hash)
+{
+    std::string server = "ws://127.0.0.1";
+    std::string path = "/login";
+    drogon::optional<uint16_t> port = 8848;
+
+    std::string serverString;
+    if (port.value_or(0) != 0)
+        serverString = server + ":" + std::to_string(port.value());
+    else
+        serverString = server;
+
+    auto wsPtr = drogon::WebSocketClient::newWebSocketClient(serverString);
+    auto req = drogon::HttpRequest::newHttpRequest();
+
+    req->setPath(path);
+    req->setMethod(drogon::HttpMethod::Head);
+    req->setParameter("username", username);
+    req->setParameter("password_hash", password_hash);
+
+    wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
+    {
+        LOG_INFO << "WebSocket connection closed!";
+    });
+
+    LOG_INFO << "Connecting to WebSocket at: " << server;
+    wsPtr->connectToServer(req, [](drogon::ReqResult r, const drogon::HttpResponsePtr&, const drogon::WebSocketClientPtr& wsPtr)
+    {
+        if (r != drogon::ReqResult::Ok)
+        {
+            LOG_ERROR << "Failed to establish WebSocket connection!";
+            LOG_ERROR << "Request result: " << r;
+            wsPtr->stop();
+            return;
+        }
+        LOG_INFO << "WebSocket connected!";
+    });
+
+    drogon::app().setLogLevel(trantor::Logger::kInfo);
+    drogon::app().run();
+    //drogon::app().getLoop()->runAfter(1, []() { drogon::app().quit(); });
 }
