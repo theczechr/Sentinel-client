@@ -147,7 +147,7 @@ void server::create_account(std::string username, std::string email_hash, std::s
 
     wsPtr->setMessageHandler([](const std::string& message, const drogon::WebSocketClientPtr&, const drogon::WebSocketMessageType& type)
     {
-        LOG_INFO << "Received response from server '" << message << "'";
+        LOG_INFO << "Response from the server '" << message << "'";
     });
 
     wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
@@ -170,7 +170,6 @@ void server::create_account(std::string username, std::string email_hash, std::s
 
     drogon::app().setLogLevel(trantor::Logger::kInfo);
     drogon::app().run();
-    //drogon::app().getLoop()->runAfter(1, []() { drogon::app().run(); });
 }
 
 void server::login_account(std::string username, std::string password_hash)
@@ -213,5 +212,4 @@ void server::login_account(std::string username, std::string password_hash)
 
     drogon::app().setLogLevel(trantor::Logger::kInfo);
     drogon::app().run();
-    //drogon::app().getLoop()->runAfter(1, []() { drogon::app().quit(); });
 }

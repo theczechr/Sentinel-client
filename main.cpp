@@ -30,7 +30,7 @@
 
 int main()
 {
-	server::login_account("tesssst", "asdhusaujdh7823jsandhj");
+	//server::login_account("tesssst", "asdhusaujdh7823jsandhj");
 	server::create_account("for", "real", "real", "for");
 	drogon::app().run();
 	//std::cout << server::is_online() << std::endl;
