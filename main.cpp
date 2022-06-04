@@ -1,6 +1,5 @@
 #include "server.hpp"
-#include "send.cpp"
-#include <iostream>
+//#include "send.cpp"
 
 //int main()
 //{
@@ -30,8 +29,8 @@
 
 int main()
 {
-	//server::login_account("tesssst", "asdhusaujdh7823jsandhj");
-	server::create_account("for", "real", "real", "for");
+	server::login_account("tesssst", "asdhusaujdh7823jsandhj");
+	//server::create_account("for", "real", "real", "for");
 	drogon::app().run();
 	//std::cout << server::is_online() << std::endl;
 }

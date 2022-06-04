@@ -1,6 +1,15 @@
 #include "server.hpp"
 using namespace std::chrono_literals;
 
+// Musime fixnout to aby slo volat x funkcii najednou
+/*
+ IDEA: Vytvorit nejaky seznam proste erroru chapes
+ Napr error ze user uz existuje nebo tak
+ Proste takovej seznam anebo to muzem proste normalne vypisovat to je jedno
+ Muzem se tom pobavit
+*/
+// Jeste dalsi comment na line 215
+
 void server::ping()
 {
     std::string server = "ws://127.0.0.1";
@@ -118,11 +127,6 @@ void server::send_message(std::string &message, std::string &room_name)
     LOG_INFO << "bye!";
 }
 
-void server::check_account_existation(std::string username, std::string email_hash, std::string password_hash, std::string phone_hash)
-{
-    // ?
-}
-
 void server::create_account(std::string username, std::string email_hash, std::string password_hash, std::string phone_hash)
 {
     std::string server = "ws://127.0.0.1";
@@ -191,6 +195,28 @@ void server::login_account(std::string username, std::string password_hash)
     req->setMethod(drogon::HttpMethod::Head);
     req->setParameter("username", username);
     req->setParameter("password_hash", password_hash);
+
+    wsPtr->setMessageHandler([](const std::string& message, const drogon::WebSocketClientPtr&, const drogon::WebSocketMessageType& type)
+    {
+        std::string messageType = "Unknown";
+        if (type == drogon::WebSocketMessageType::Text)
+            messageType = "text";
+        else if (type == drogon::WebSocketMessageType::Pong)
+            messageType = "pong";
+        else if (type == drogon::WebSocketMessageType::Ping)
+            messageType = "ping";
+        else if (type == drogon::WebSocketMessageType::Binary)
+            messageType = "binary";
+        else if (type == drogon::WebSocketMessageType::Close)
+            messageType = "Close";
+
+        LOG_INFO << "Response from the server '" << message << "', message type '" << messageType << "'";
+
+        if (message[0] == '0') // No nevim jestli to je nejlepsi reseni.. prislo mi blby tam davat cely string tak na zacatku te message je "bool"
+        {
+            LOG_ERROR << message;
+        }
+    });
 
     wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
     {
