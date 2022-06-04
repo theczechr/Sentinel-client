@@ -3,12 +3,12 @@ using namespace std::chrono_literals;
 
 // Musime fixnout to aby slo volat x funkcii najednou
 /*
- IDEA: Vytvorit nejaky seznam proste erroru chapes
- Napr error ze user uz existuje nebo tak
- Proste takovej seznam anebo to muzem proste normalne vypisovat to je jedno
- Muzem se tom pobavit
+ * IDEA: Vytvorit nejaky seznam proste erroru chapes
+ * Napr. error ze user uz existuje nebo tak
+ * Proste takovej seznam anebo to muzem proste normalne vypisovat to je jedno
+ * Muzem se tom pobavit
 */
-// Jeste dalsi comment na line 215
+// Jeste dalsi comment na line cca 215
 
 void server::ping()
 {
@@ -155,9 +155,9 @@ void server::create_account(std::string username, std::string email_hash, std::s
     });
 
     wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
-        {
-            LOG_INFO << "WebSocket connection closed!";
-        });
+    {
+        LOG_INFO << "WebSocket connection closed!";
+    });
 
     LOG_INFO << "Connecting to WebSocket at: " << server;
     wsPtr->connectToServer(req, [](drogon::ReqResult r, const drogon::HttpResponsePtr&, const drogon::WebSocketClientPtr& wsPtr)
