@@ -1,4 +1,7 @@
 #include "server.hpp"
+#include <drogon/WebSocketClient.h>
+#include <drogon/PubSubService.h>
+#include <drogon/HttpAppFramework.h>
 using namespace std::chrono_literals;
 
 // Musime fixnout to aby slo volat x funkcii najednou
@@ -89,17 +92,19 @@ bool server::is_online()
 void server::send_message(std::string &message, std::string &room_name)
 {
     std::string server = "ws://127.0.0.1";
-    std::string path = "/test";
+    std::string path = "/connectionTest";
     drogon::optional<uint16_t> port = 8848;
 
     const std::string key = "room_name";
     const std::string value = "hello";
 
     std::string serverString;
+
     if (port.value_or(0) != 0)
         serverString = server + ":" + std::to_string(port.value());
     else
         serverString = server;
+
     auto wsPtr = drogon::WebSocketClient::newWebSocketClient(serverString);
     auto req = drogon::HttpRequest::newHttpRequest();
 
@@ -108,8 +113,8 @@ void server::send_message(std::string &message, std::string &room_name)
 
     wsPtr->connectToServer(
         req,
-        [message](drogon::ReqResult r,
-            const drogon::HttpResponsePtr&,
+        [message, cb](drogon::ReqResult r,
+            const drogon::HttpResponsePtr& a,
             const drogon::WebSocketClientPtr& wsPtr) {
                 if (r != drogon::ReqResult::Ok)
                 {
@@ -120,7 +125,34 @@ void server::send_message(std::string &message, std::string &room_name)
                 }
                 LOG_INFO << "WebSocket connected!";
                 wsPtr->getConnection()->send(message, drogon::WebSocketMessageType::Text);
+                auto asd = a->getHeaders();
+                for (auto str: asd)
+                {
+                    auto v = std::get<std::string>(str);
+                    std::cout << v << std::endl;
+                }
+                auto cd = a->getBody();
+                std::cout << cd << std::endl;
+                
         });
+    wsPtr->setMessageHandler([](const std::string& message,
+        const drogon::WebSocketClientPtr&,
+        const drogon::WebSocketMessageType& type) {
+            std::string messageType = "Unknown";
+            if (type == drogon::WebSocketMessageType::Text)
+                messageType = "text";
+            else if (type == drogon::WebSocketMessageType::Pong)
+                messageType = "pong";
+            else if (type == drogon::WebSocketMessageType::Ping)
+                messageType = "ping";
+            else if (type == drogon::WebSocketMessageType::Binary)
+                messageType = "binary";
+            else if (type == drogon::WebSocketMessageType::Close)
+                messageType = "Close";
+
+            LOG_INFO << "new message (" << messageType << "): " << message;
+        });
+
     drogon::app().getLoop()->runAfter(15, []() { drogon::app().quit(); });
     drogon::app().setLogLevel(trantor::Logger::kInfo);
     drogon::app().run();
