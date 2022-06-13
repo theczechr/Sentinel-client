@@ -22,9 +22,7 @@ void menu::start()
 			choosing_path = false;
 			break;
 		default:
-
-			LOG_ERROR << "ERROR: " << "Spatne cislo\n";
-
+			LOG_ERROR << "ERROR: " << "Spatne cislo";
 			choosing_path = false;
 			break;
 		}

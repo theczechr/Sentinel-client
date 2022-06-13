@@ -198,24 +198,10 @@ void server::login_account(std::string username, std::string password_hash)
 
     wsPtr->setMessageHandler([](const std::string& message, const drogon::WebSocketClientPtr&, const drogon::WebSocketMessageType& type)
     {
-        std::string messageType = "Unknown";
-        if (type == drogon::WebSocketMessageType::Text)
-            messageType = "text";
-        else if (type == drogon::WebSocketMessageType::Pong)
-            messageType = "pong";
-        else if (type == drogon::WebSocketMessageType::Ping)
-            messageType = "ping";
-        else if (type == drogon::WebSocketMessageType::Binary)
-            messageType = "binary";
-        else if (type == drogon::WebSocketMessageType::Close)
-            messageType = "Close";
-
-        LOG_INFO << "Response from the server '" << message << "', message type '" << messageType << "'";
+        LOG_INFO << "Response from the server '" << message << "'";
 
         if (message[0] == '0') // No nevim jestli to je nejlepsi reseni.. prislo mi blby tam davat cely string tak na zacatku te message je "bool"
-        {
             LOG_ERROR << message;
-        }
     });
 
     wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
@@ -235,6 +221,57 @@ void server::login_account(std::string username, std::string password_hash)
         }
         LOG_INFO << "WebSocket connected!";
     });
+
+    drogon::app().setLogLevel(trantor::Logger::kInfo);
+    drogon::app().run();
+}
+
+void server::change_username(std::string& old_username, std::string& new_username, std::string& password_hash)
+{
+    std::string server = "ws://127.0.0.1";
+    std::string path = "/login";
+    drogon::optional<uint16_t> port = 8848;
+
+    std::string serverString;
+    if (port.value_or(0) != 0)
+        serverString = server + ":" + std::to_string(port.value());
+    else
+        serverString = server;
+
+    auto wsPtr = drogon::WebSocketClient::newWebSocketClient(serverString);
+    auto req = drogon::HttpRequest::newHttpRequest();
+
+    req->setPath(path);
+    req->setMethod(drogon::HttpMethod::Head);
+    req->setParameter("username", old_username);
+    req->setParameter("password_hash", password_hash);
+    req->setParameter("new_username", new_username);
+
+    wsPtr->setMessageHandler([](const std::string& message, const drogon::WebSocketClientPtr&, const drogon::WebSocketMessageType& type)
+        {
+            LOG_INFO << "Response from the server '" << message << "'";
+
+            if (message[0] == '0') // No nevim jestli to je nejlepsi reseni.. prislo mi blby tam davat cely string tak na zacatku te message je "bool"
+                LOG_ERROR << message;
+        });
+
+    wsPtr->setConnectionClosedHandler([](const drogon::WebSocketClientPtr&)
+        {
+            LOG_INFO << "WebSocket connection closed!";
+        });
+
+    LOG_INFO << "Connecting to WebSocket at: " << server;
+    wsPtr->connectToServer(req, [](drogon::ReqResult r, const drogon::HttpResponsePtr&, const drogon::WebSocketClientPtr& wsPtr)
+        {
+            if (r != drogon::ReqResult::Ok)
+            {
+                LOG_ERROR << "Failed to establish WebSocket connection!";
+                LOG_ERROR << "Request result: " << r;
+                wsPtr->stop();
+                return;
+            }
+            LOG_INFO << "WebSocket connected!";
+        });
 
     drogon::app().setLogLevel(trantor::Logger::kInfo);
     drogon::app().run();
