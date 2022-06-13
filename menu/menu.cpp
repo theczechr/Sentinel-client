@@ -49,31 +49,35 @@ void menu::create()
 	std::cin >> phone_number;
 	
 	Botan::AutoSeeded_RNG rng;
-	// DOCS k botanu:
-		// https://botan.randombit.net/handbook/botan.pdf
-		// https://botan.randombit.net/handbook/
+	/*
+	* DOCS k botanu:
+	* * https://botan.randombit.net/handbook/botan.pdf
+	* * https://botan.randombit.net/handbook/
+	*/
 	email = Botan::generate_bcrypt(email, rng);
 	password = Botan::generate_bcrypt(password, rng);
 	phone_number = Botan::generate_bcrypt(phone_number, rng);
 
-	// Vypise ty hashe
-	LOG_INFO << email;
-	LOG_INFO << password;
-	LOG_INFO << phone_number;
+	server::create_account(username, email, password, phone_number);
 
-	/*
+	/* 
+	* Vypise ty hashe
+	LOG_DEBUG << email;
+	LOG_DEBUG << password;
+	LOG_DEBUG << phone_number;
+
 	* Returnuje to, jestli to matchuje
 	* Jenom jsem zkousel jestli to funguje
 	LOG_INFO << Botan::check_bcrypt("karlos@protonmail.com", "$2a$12$EZO38XCgdPikYUng7l5np.KkxUB45OpsHgNI3dM1MDJn6t1hxw9lq");
 	LOG_INFO << Botan::check_bcrypt("sdag12hd1dh1d^*&(", "$2a$12$1gOINTpsQm1yaj7WtKCsv.tNgHcfwFOTRPnWPmW8z2p8H7/cxsbd2");
 	LOG_INFO << Botan::check_bcrypt("789123658", "$2a$12$qDyufSzMRl.N/GkFWLMU3.HPRSKYWCWAJIRKhMKiwsJ.rRYs157B.");
 	*/
-
-	// Send to server
 }
 
 void menu::login()
 {
+	Botan::AutoSeeded_RNG rng;
+
 	std::string username;
 	std::string password;
 
@@ -82,4 +86,7 @@ void menu::login()
 	std::cin >> username;
 	std::cout << "Enter password: ";
 	std::cin >> password;
+
+	password = Botan::generate_bcrypt(password, rng);
+	server::login_account(username, password);
 }
