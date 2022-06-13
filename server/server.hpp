@@ -10,4 +10,5 @@ namespace server
 	void create_account(std::string username, std::string email_hash, std::string password_hash, std::string phone_hash);
 	void login_account(std::string username, std::string password_hash);
 	void send_message(std::string& message, std::string& room_name);
+	void receive_message();
 }
