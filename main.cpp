@@ -29,7 +29,10 @@
 
 int main()
 {
-	server::login_account("tesssst", "asdhusaujdh7823jsandhj");
+	//server::login_account("tesssst", "asdhusaujdh7823jsandhj");
+	std::string a = "a";
+	std::string b = "b";
+	server::send_message(a, b);
 	//server::create_account("for", "real", "real", "for");
 	drogon::app().run();
 	//std::cout << server::is_online() << std::endl;

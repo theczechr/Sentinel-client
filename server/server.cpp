@@ -89,10 +89,10 @@ bool server::is_online()
     return true;
 }
 
-void server::send_message(std::string &message, std::string &room_name)
+void server::send_message(std::string message, std::string room_name)
 {
     std::string server = "ws://127.0.0.1";
-    std::string path = "/connectionTest";
+    std::string path = "/sendtxt";
     drogon::optional<uint16_t> port = 8848;
 
     const std::string key = "room_name";
@@ -109,11 +109,12 @@ void server::send_message(std::string &message, std::string &room_name)
     auto req = drogon::HttpRequest::newHttpRequest();
 
     req->setPath(path);
+    req->setMethod(drogon::HttpMethod::Head);
     req->setParameter(key, room_name);
 
     wsPtr->connectToServer(
         req,
-        [message, cb](drogon::ReqResult r,
+        [message](drogon::ReqResult r,
             const drogon::HttpResponsePtr& a,
             const drogon::WebSocketClientPtr& wsPtr) {
                 if (r != drogon::ReqResult::Ok)
@@ -124,7 +125,9 @@ void server::send_message(std::string &message, std::string &room_name)
                     return;
                 }
                 LOG_INFO << "WebSocket connected!";
+                
                 wsPtr->getConnection()->send(message, drogon::WebSocketMessageType::Text);
+                /*
                 auto asd = a->getHeaders();
                 for (auto str: asd)
                 {
@@ -133,6 +136,7 @@ void server::send_message(std::string &message, std::string &room_name)
                 }
                 auto cd = a->getBody();
                 std::cout << cd << std::endl;
+                */
                 
         });
     wsPtr->setMessageHandler([](const std::string& message,
@@ -153,10 +157,8 @@ void server::send_message(std::string &message, std::string &room_name)
             LOG_INFO << "new message (" << messageType << "): " << message;
         });
 
-    drogon::app().getLoop()->runAfter(15, []() { drogon::app().quit(); });
     drogon::app().setLogLevel(trantor::Logger::kInfo);
     drogon::app().run();
-    LOG_INFO << "bye!";
 }
 
 void server::create_account(std::string username, std::string email_hash, std::string password_hash, std::string phone_hash)
