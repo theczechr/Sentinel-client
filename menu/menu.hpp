@@ -10,4 +10,5 @@ namespace menu
 	void start();
 	void login();
 	void create();
+	void secure_chat();
 }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "" FORCE)
 
-project(KRapp-client
+project(Sentinel-client
         LANGUAGES CXX
 )
 
@@ -14,6 +14,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/menu
     ${CMAKE_CURRENT_SOURCE_DIR}/server
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/crypto
 )
 
 file(GLOB SRC
@@ -21,6 +22,7 @@ file(GLOB SRC
    ${CMAKE_CURRENT_SOURCE_DIR}/menu/*.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/server/*.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/crypto/*.cpp
 )
 
 find_package(Drogon CONFIG REQUIRED)

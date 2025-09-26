@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include <iostream>
 //#include "send.cpp"
 
 //int main()
@@ -29,11 +30,23 @@
 
 int main()
 {
-	//server::login_account("tesssst", "asdhusaujdh7823jsandhj");
-	std::string a = "a";
-	std::string b = "b";
-	server::send_message(a, b);
-	//server::create_account("for", "real", "real", "for");
-	drogon::app().run();
-	//std::cout << server::is_online() << std::endl;
+	std::string room = "general";
+	std::cout << "Generating ephemeral X25519 key..." << std::endl;
+	std::string our_pub = server::generate_ephemeral_public_key();
+	std::cout << "Our public key (Base64):\n" << our_pub << std::endl;
+
+	std::cout << "Paste peer public key (Base64), then press Enter:\n> ";
+	std::string peer_pub;
+	std::cin >> peer_pub;
+
+	server::set_room_key_from_exchange(room, peer_pub);
+	std::cout << "Derived shared room key for '" << room << "'." << std::endl;
+
+	std::cout << "Enter message to send:\n> ";
+	std::string message;
+	std::cin.ignore();
+	std::getline(std::cin, message);
+
+	server::send_message_room_key(message, room);
+	return 0;
 }
